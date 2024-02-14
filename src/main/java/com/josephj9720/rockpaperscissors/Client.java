@@ -3,14 +3,16 @@
  */
 
 package com.josephj9720.rockpaperscissors;
-
+import com.josephj9720.rockpaperscissors.UI.ClientGUI;
+import javax.swing.JFrame;
 /**
  *
  * @author josep
  */
-public class RockPaperScissors {
+public class Client {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        ClientGUI UI = new ClientGUI();
+        UI.setupUI();
     }
 }
