@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
+import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -225,9 +226,7 @@ public class ClientView {
         infoBox.setVisible(false);
         resultBox.setText("");
         resultBox.setVisible(false);
-        playersList.removeAllItems();
-        playersList.setVisible(false);
-        playersList.setEnabled(true);
+        this.resetPlayersList();
         rockButton.setEnabled(true);
         paperButton.setEnabled(true);
         scissorsButton.setEnabled(true);
@@ -287,6 +286,13 @@ public class ClientView {
         playersList.setSelectedItem("Players Available");
     }
     
+    private void resetPlayersList(){
+        playersList.removeAllItems();
+        playersList.addItem("Players Available");
+        playersList.setVisible(false);
+        playersList.setEnabled(true);
+    }
+    
     public void setPlayersListSelection(String playerName){
         playersList.setSelectedItem(playerName);
     }
@@ -337,7 +343,7 @@ public class ClientView {
         declineButton.setVisible(true);
     }
     
-    public void hideAcceptDelineButtons(){
+    public void hideAcceptDeclineButtons(){
         acceptButton.setVisible(false);
         declineButton.setVisible(false);
     }
@@ -350,8 +356,137 @@ public class ClientView {
         resultBox.setVisible(false);
     }
     
-    public void setResultBox(){
-        //to-do
+    public void setResultBox(String result) throws InterruptedException{
+        switch(result){
+            case "win":
+                displayWin();
+                break;
+            
+            case "tie":
+                displayTie();
+                break;
+            
+            case "lose":
+                displayLose();
+                break;
+                    
+        }
+    }
+    
+    private void displayWin() throws InterruptedException{
+        
+        this.hideRockPaperScissorsButtons();
+        resultBox.setText("\nYOU WIN!");
+        this.showResultBox();
+        this.disablePlayConnectButtons();
+        Random random = new Random();
+        
+        for(int i = 0; i < 20; i++){
+            
+            Color color = this.getColor(random.nextInt(7) + 1);
+            resultBox.setForeground(color);
+            resultBox.setBorder(BorderFactory.createLineBorder(color, 3, false));
+            Thread.sleep(150);
+              
+        }
+        
+        this.hideResultBox();
+        this.enablePlayConnectButtons();
+        this.enableRockPaperScissorsButtons();
+        this.showRockPaperScissorsButtons();
+          
+    }
+    
+    private void displayTie() throws InterruptedException{
+        
+        this.hideRockPaperScissorsButtons();
+        resultBox.setText("\nYOU WIN!");
+        this.showResultBox();
+        this.disablePlayConnectButtons();
+        
+        for(int i = 0; i < 4; i++){
+            
+            Color color = (i % 2) == 0 ? this.getColor(9) : this.getColor(8);
+            resultBox.setForeground(color);
+            resultBox.setBorder(BorderFactory.createLineBorder(color, 3, false));
+            Thread.sleep(750);
+              
+        }
+        
+        this.hideResultBox();
+        this.enablePlayConnectButtons();
+        this.enableRockPaperScissorsButtons();
+        this.showRockPaperScissorsButtons();
+    }
+    
+    private void displayLose() throws InterruptedException{
+        
+        this.hideRockPaperScissorsButtons();
+        resultBox.setText("\nYOU WIN!");
+        this.showResultBox();
+        this.disablePlayConnectButtons();
+        
+        for(int i = 0; i < 3; i++){
+            
+            Color color = (i % 2) == 0 ? this.getColor(9) : this.getColor(2) ;
+            resultBox.setForeground(color);
+            resultBox.setBorder(BorderFactory.createLineBorder(color, 3, false));
+            Thread.sleep(1000);
+              
+        }
+        
+        this.hideResultBox();
+        this.enablePlayConnectButtons();
+        this.enableRockPaperScissorsButtons();
+        this.showRockPaperScissorsButtons();
+        
+    }
+    
+    private Color getColor(int i){
+        
+        Color c = Color.WHITE;
+
+        switch(i) {
+
+            case 1:
+                    c = Color.BLUE;
+                    break;
+
+            case 2:
+                    c = Color.RED;
+                    break;
+
+            case 3:
+                    c = Color.CYAN;
+                    break;
+
+            case 4:
+                    c = Color.GREEN;
+                    break;
+
+            case 5:
+                    c = Color.MAGENTA;
+                    break;
+
+            case 6:
+                    c = Color.PINK;
+                    break;
+
+            case 7:
+                    c = Color.ORANGE;
+                    break;
+                    
+            case 8:
+                    c = Color.YELLOW;
+                    break;
+
+            case 9:
+                    c = Color.BLACK;
+                    break;
+        }
+
+
+        return c;
     }
     
     public void disablePlayConnectButtons(){

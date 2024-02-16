@@ -15,6 +15,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -130,7 +132,7 @@ public class ClientController {
             try{
                 
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                clientView.showAcceptDeclineButtons();
+                clientView.hideAcceptDeclineButtons();
                 clientView.togglePlayButton();
                 String sendingSentence = "-Accepted\n";
                 outToServer.writeBytes(sendingSentence);
@@ -155,6 +157,7 @@ public class ClientController {
             try{
                 
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                clientView.hideAcceptDeclineButtons();
                 clientView.displayInfo("You declined the request. Game not started.");
                 clientView.resetPlayersListSelection();
                 clientView.enablePlayersList();
@@ -289,10 +292,13 @@ public class ClientController {
                     
                     BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     String receivedSentence;
-                    
+                    //problems are mainly when disconnecting
                     while(true){
                         
                         receivedSentence = inFromServer.readLine();
+                        if(receivedSentence == null){
+                            continue;
+                        }
                         System.out.println("Here is what the client receives: " + receivedSentence.split(",")[0]);
                         
                         if(receivedSentence.startsWith("-Connected")){
@@ -318,14 +324,16 @@ public class ClientController {
                             
                         } else if (receivedSentence.startsWith("-Result")){
                             
-                            
+                            String[] splitSentence = receivedSentence.split(",");
+                            String result = splitSentence[1];
+                            clientView.setResultBox(result);
                             
                         } else if (receivedSentence.startsWith("-Accepted")){
                             
                             clientView.displayInfo("Request Accepted.");
                             clientView.disablePlayersList();
                             clientView.showRockPaperScissorsButtons();
-                            clientView.hideAcceptDelineButtons();
+                            clientView.hideAcceptDeclineButtons();
                             
                         } else if (receivedSentence.startsWith("-Declined")){
                             
@@ -333,7 +341,7 @@ public class ClientController {
                             clientView.togglePlayButton();
                             clientView.resetPlayersListSelection();
                             clientView.enablePlayersList();
-                            clientView.hideAcceptDelineButtons();
+                            clientView.hideAcceptDeclineButtons();
                             
                         } else if (receivedSentence.startsWith("-Request")){
                             
@@ -350,7 +358,7 @@ public class ClientController {
                             clientView.resetPlayersListSelection();
                             clientView.enablePlayersList();
                             clientView.togglePlayButton();
-                            clientView.hideAcceptDelineButtons();
+                            clientView.hideAcceptDeclineButtons();
                             clientView.displayInfo("The game has stopped.");
                             clientView.hideRockPaperScissorsButtons();
                             
@@ -359,7 +367,7 @@ public class ClientController {
                     }
                     
                     
-                } catch (IOException ex) {
+                } catch (IOException | InterruptedException ex) {
                     
                     System.out.println(ex.getMessage());
                     
