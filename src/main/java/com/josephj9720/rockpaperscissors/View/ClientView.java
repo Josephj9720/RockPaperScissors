@@ -400,7 +400,7 @@ public class ClientView {
     private void displayTie() throws InterruptedException{
         
         this.hideRockPaperScissorsButtons();
-        resultBox.setText("\nYOU WIN!");
+        resultBox.setText("\nIT IS A TIE!");
         this.showResultBox();
         this.disablePlayConnectButtons();
         
@@ -422,13 +422,13 @@ public class ClientView {
     private void displayLose() throws InterruptedException{
         
         this.hideRockPaperScissorsButtons();
-        resultBox.setText("\nYOU WIN!");
+        resultBox.setText("\nYOU LOSE!");
         this.showResultBox();
         this.disablePlayConnectButtons();
         
         for(int i = 0; i < 3; i++){
             
-            Color color = (i % 2) == 0 ? this.getColor(9) : this.getColor(2) ;
+            Color color = (i % 2) == 0 ? this.getColor(2) : this.getColor(9) ;
             resultBox.setForeground(color);
             resultBox.setBorder(BorderFactory.createLineBorder(color, 3, false));
             Thread.sleep(1000);

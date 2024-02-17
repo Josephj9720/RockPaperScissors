@@ -133,7 +133,6 @@ public class ClientController {
                 
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
                 clientView.hideAcceptDeclineButtons();
-                clientView.togglePlayButton();
                 String sendingSentence = "-Accepted\n";
                 outToServer.writeBytes(sendingSentence);
                 clientView.showRockPaperScissorsButtons();
@@ -157,11 +156,12 @@ public class ClientController {
             try{
                 
                 DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                clientView.togglePlayButton();
                 clientView.hideAcceptDeclineButtons();
                 clientView.displayInfo("You declined the request. Game not started.");
                 clientView.resetPlayersListSelection();
                 clientView.enablePlayersList();
-                String sendingSentence = "-Decline\n";
+                String sendingSentence = "-Declined\n";
                 outToServer.writeBytes(sendingSentence);
                 clientView.clearInfo();
                 
@@ -326,7 +326,13 @@ public class ClientController {
                             
                             String[] splitSentence = receivedSentence.split(",");
                             String result = splitSentence[1];
+                            System.out.println("Client side result received: " + "{ " + clientModel.getName() + ", " + result + " }");
                             clientView.setResultBox(result);
+                            //SHOULD ALSO CREATE A GAME HISTORY RECORD IN THE MODEL
+                            //YOU SHOULD HAVE THE OPPONENT NAME RECORDED AS THE GAME START
+                            //NEED TO FIGURE OUT HOW TO DO IT WHEN YOU'VE SENT THE REQUEST
+                            //AND WHEN IT'S THE OPPONENT THAT STARTED THE REQUEST
+                            //IT MIGHT  BE THE SAME OR DIFFERENT
                             
                         } else if (receivedSentence.startsWith("-Accepted")){
                             
@@ -341,7 +347,7 @@ public class ClientController {
                             clientView.togglePlayButton();
                             clientView.resetPlayersListSelection();
                             clientView.enablePlayersList();
-                            clientView.hideAcceptDeclineButtons();
+                            clientView.hideAcceptDeclineButtons();;
                             
                         } else if (receivedSentence.startsWith("-Request")){
                             
@@ -351,6 +357,7 @@ public class ClientController {
                             clientView.displayInfo(playerName + " wants to play! Do you accept?");
                             clientView.disablePlayersList();
                             clientView.showAcceptDeclineButtons();
+                            clientView.togglePlayButton();
                             
                         } else if (receivedSentence.startsWith("-Stopped")){
                             

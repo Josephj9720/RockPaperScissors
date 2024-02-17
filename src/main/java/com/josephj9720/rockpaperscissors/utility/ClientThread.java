@@ -61,6 +61,18 @@ public class ClientThread extends Thread{
         this.opponent = opponent;
     }
     
+    private String getPlayerMove(){
+        return this.playerMove;
+    }
+    
+    private void setPlayerMove(String playerMove){
+        this.playerMove = playerMove;
+    }
+    
+    private void resetPlayerMove(){
+        this.playerMove = "";
+    }
+    
     private void removeClient(){
         
         try{
@@ -132,7 +144,7 @@ public class ClientThread extends Thread{
                     
                     this.opponent = client;
                     client.setOpponent(this);
-                    outToClient = new DataOutputStream(opponent.getConnectionSocket().getOutputStream());
+                    outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
                     outToClient.writeBytes("-Request," + this.clientName + "\n");
                     
                 }
@@ -162,7 +174,7 @@ public class ClientThread extends Thread{
                 
         try{
             
-            DataOutputStream outToClient = new DataOutputStream(opponent.getConnectionSocket().getOutputStream());
+            DataOutputStream outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
             outToClient.writeBytes("-Accepted\n");
             this.isAvailable = false;  
             
@@ -178,8 +190,8 @@ public class ClientThread extends Thread{
                 
         try{
             
-            DataOutputStream outToClient = new DataOutputStream(opponent.getConnectionSocket().getOutputStream());
-            outToClient.writeBytes("-Declined"); 
+            DataOutputStream outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
+            outToClient.writeBytes("-Declined\n"); 
             this.opponent.setAvailable(true);
             
             for(int i = 0; i < clients.size(); i++){
@@ -197,7 +209,7 @@ public class ClientThread extends Thread{
                 
             }
             
-            opponent.setOpponent(new ClientThread());
+            this.opponent.getOpponent().setOpponent(new ClientThread());
             this.opponent.setOpponent(new ClientThread());
             
             
@@ -213,7 +225,33 @@ public class ClientThread extends Thread{
         
         try{
             
-            DataOutputStream outToClient;   
+            DataOutputStream outToClient;
+            
+            for(int i = 0; i < clients.size(); i++){
+                
+                ClientThread client = clients.get(i);
+                
+                if(client.getClientName().equals(this.clientName)){
+                    
+                    outToClient = new DataOutputStream(client.getConnectionSocket().getOutputStream());
+                    outToClient.writeBytes("-Stopped\n");
+                    this.setAvailable(true);
+                    
+                } else if (client.getClientName().equals(this.opponent.getClientName())){
+                    
+                    outToClient = new DataOutputStream(client.getConnectionSocket().getOutputStream());
+                    outToClient.writeBytes("-Stopped\n");
+                    this.opponent.setAvailable(true);
+                    
+                } else {
+                    
+                    outToClient = new DataOutputStream(client.getConnectionSocket().getOutputStream());
+                    outToClient.writeBytes("-addList," + this.clientName + "\n");
+                    outToClient.writeBytes("-addList," + this.opponent.getClientName() + "\n");
+                    
+                }
+                
+            }
             
             
             
@@ -230,6 +268,42 @@ public class ClientThread extends Thread{
         try{
             
             DataOutputStream outToClient;
+           
+            System.out.println("{ " + clientName + ", " + playerMove + " }");
+            
+            String opponentPlayerMove = this.opponent.getPlayerMove();
+            
+            if(!this.playerMove.isEmpty() && !opponentPlayerMove.isEmpty()){
+                
+                if( GameLogic.playerMove(this.playerMove).winsAgainst(opponentPlayerMove) ){
+                    
+                    outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
+                    outToClient.writeBytes("-Result,win\n");
+                    outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
+                    outToClient.writeBytes("-Result,lose\n");
+                    
+                } else if( GameLogic.playerMove(this.playerMove).losesTo(opponentPlayerMove) ){
+                    
+                    outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
+                    outToClient.writeBytes("-Result,lose\n");
+                    outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
+                    outToClient.writeBytes("-Result,win\n");
+                    
+                    
+                } else {
+                    
+                    outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
+                    outToClient.writeBytes("-Result,tie\n");
+                    outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
+                    outToClient.writeBytes("-Result,tie\n");
+                    System.out.println("Yo we in tie!");
+                    
+                }
+                
+                this.resetPlayerMove();
+                this.opponent.resetPlayerMove();
+                
+            }
 
             
             
@@ -277,6 +351,8 @@ public class ClientThread extends Thread{
                     
                 } else if (clientSentence.startsWith("-Move")){
                     
+                    String[] splitSentence = clientSentence.split(",");
+                    this.playerMove = splitSentence[1];
                     this.calculateGameResult();
                     
                 }
