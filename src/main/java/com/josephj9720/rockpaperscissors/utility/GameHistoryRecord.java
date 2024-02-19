@@ -12,7 +12,7 @@ public class GameHistoryRecord {
     private String opponent;
     private String gameResult;
     
-    GameHistoryRecord(String oponent, String gameResult){
+    public GameHistoryRecord(String oponent, String gameResult){
         this.opponent = oponent;
         this.gameResult = gameResult;
     }
@@ -27,6 +27,10 @@ public class GameHistoryRecord {
     
     public void setGameResult(String gameResult){
         this.gameResult = gameResult;
+    }
+    
+    public String getGameResult(){
+        return this.gameResult;
     }
     
 }

@@ -278,25 +278,24 @@ public class ClientThread extends Thread{
                 if( GameLogic.playerMove(this.playerMove).winsAgainst(opponentPlayerMove) ){
                     
                     outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
-                    outToClient.writeBytes("-Result,win\n");
+                    outToClient.writeBytes("-Result,win," + opponent.getClientName() + "\n");
                     outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
-                    outToClient.writeBytes("-Result,lose\n");
+                    outToClient.writeBytes("-Result,lose,"+ this.clientName + "\n");
                     
                 } else if( GameLogic.playerMove(this.playerMove).losesTo(opponentPlayerMove) ){
                     
                     outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
-                    outToClient.writeBytes("-Result,lose\n");
+                    outToClient.writeBytes("-Result,lose," + opponent.getClientName() + "\n");
                     outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
-                    outToClient.writeBytes("-Result,win\n");
+                    outToClient.writeBytes("-Result,win," + this.clientName + "\n");
                     
                     
                 } else {
                     
                     outToClient = new DataOutputStream(this.connectionSocket.getOutputStream());
-                    outToClient.writeBytes("-Result,tie\n");
+                    outToClient.writeBytes("-Result,tie," + opponent.getClientName() + "\n");
                     outToClient = new DataOutputStream(this.opponent.getConnectionSocket().getOutputStream());
-                    outToClient.writeBytes("-Result,tie\n");
-                    System.out.println("Yo we in tie!");
+                    outToClient.writeBytes("-Result,tie," + this.clientName + "\n");
                     
                 }
                 

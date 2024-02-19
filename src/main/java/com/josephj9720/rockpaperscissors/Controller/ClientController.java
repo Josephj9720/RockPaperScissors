@@ -6,6 +6,7 @@ package com.josephj9720.rockpaperscissors.Controller;
 
 import com.josephj9720.rockpaperscissors.Model.ClientModel;
 import com.josephj9720.rockpaperscissors.View.ClientView;
+import com.josephj9720.rockpaperscissors.utility.GameHistoryRecord;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -40,7 +41,7 @@ public class ClientController {
         this.clientView.attachRockListener(new RockListener());
         this.clientView.attachPaperListener(new PaperListener());
         this.clientView.attachScissorsListener(new ScissorsListener());
-        this.clientView.attachWindowClosedListener(new ClosingWindowListener());
+        this.clientView.attachClientWindowClosedListener(new ClosingClientWindowListener());
         
     }
     
@@ -179,6 +180,11 @@ public class ClientController {
         @Override
         public void actionPerformed(ActionEvent e) {
             
+            clientView.createGameHistoryFrame(clientModel.getGameHistory());
+            
+            clientView.attachGameHistoryWindowClosedListener(new ClosingGameHistoryWindowListener());
+            clientView.disableGameHistoryButton();
+            
         }
 
     }
@@ -252,7 +258,7 @@ public class ClientController {
 
     }
     
-    private class ClosingWindowListener extends WindowAdapter{
+    private class ClosingClientWindowListener extends WindowAdapter{
         
         @Override
         public void windowClosing(WindowEvent we){
@@ -280,6 +286,18 @@ public class ClientController {
             }
             
         }
+        
+    }
+    
+    private class ClosingGameHistoryWindowListener extends WindowAdapter{
+        
+        @Override
+        public void windowClosing(WindowEvent we){
+            
+            clientView.enableGameHistoryButton();
+            
+        }
+            
         
     }
     
@@ -326,13 +344,12 @@ public class ClientController {
                             
                             String[] splitSentence = receivedSentence.split(",");
                             String result = splitSentence[1];
+                            String opponentName = splitSentence[2];
+                            
                             System.out.println("Client side result received: " + "{ " + clientModel.getName() + ", " + result + " }");
+                            
                             clientView.setResultBox(result);
-                            //SHOULD ALSO CREATE A GAME HISTORY RECORD IN THE MODEL
-                            //YOU SHOULD HAVE THE OPPONENT NAME RECORDED AS THE GAME START
-                            //NEED TO FIGURE OUT HOW TO DO IT WHEN YOU'VE SENT THE REQUEST
-                            //AND WHEN IT'S THE OPPONENT THAT STARTED THE REQUEST
-                            //IT MIGHT  BE THE SAME OR DIFFERENT
+                            clientModel.addGameHistoryRecord(new GameHistoryRecord(opponentName, result));
                             
                         } else if (receivedSentence.startsWith("-Accepted")){
                             

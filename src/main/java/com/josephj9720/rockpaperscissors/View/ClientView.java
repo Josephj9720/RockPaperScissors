@@ -5,11 +5,15 @@
 package com.josephj9720.rockpaperscissors.View;
 
 import com.josephj9720.rockpaperscissors.utility.CellSelectionRenderer;
+import com.josephj9720.rockpaperscissors.utility.GameHistoryRecord;
+import com.josephj9720.rockpaperscissors.utility.GameHistoryTableModel;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
+import java.util.List;
 import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -18,9 +22,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -31,6 +38,7 @@ import javax.swing.text.StyledDocument;
  */
 public class ClientView {
     private JFrame frame;
+    private JFrame gameHistoryFrame;
     private ClassLoader classLoader;
     private JLabel clientNameLabel;
     private JTextField clientNameField;
@@ -38,6 +46,8 @@ public class ClientView {
     private JComboBox playersList;
     private JTextArea infoBox;
     private JTextPane resultBox;
+    private JTable gameHistoryTable;
+    private JScrollPane gameHistoryScrollPane;
     private JButton connectButton;
     private JButton playButton;
     private JButton acceptButton;
@@ -236,7 +246,12 @@ public class ClientView {
         clientNameField.setText("");
         clientNameField.setEnabled(true);
         gameHistoryButton.setVisible(false);
+        gameHistoryButton.setEnabled(true);
         connectButton.setText("Connect");
+        
+        if(gameHistoryFrame != null){
+            gameHistoryFrame.dispose();
+        }
     }
     
     public boolean isClientNameValid(){
@@ -538,6 +553,45 @@ public class ClientView {
         return connectButton.getText();
     }
     
+    public void disableGameHistoryButton(){
+        gameHistoryButton.setEnabled(false);
+    }
+    
+    public void enableGameHistoryButton(){
+        gameHistoryButton.setEnabled(true);
+    }
+    
+    public void createGameHistoryFrame(List<GameHistoryRecord> gameHistory){
+        
+        gameHistoryFrame = new JFrame("RockPaperScissors Client - Game History");
+        gameHistoryFrame.setLayout(new BorderLayout());
+        gameHistoryFrame.setBounds(frame.getX() + frame.getWidth() + 10, frame.getY(), 300, 400);
+        gameHistoryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        GameHistoryTableModel model = new GameHistoryTableModel();
+        model.addColumn("Opponent");
+        model.addColumn("Game Result");
+        model.addRows(gameHistory);
+        
+        gameHistoryTable = new JTable(model);
+        gameHistoryTable.setFillsViewportHeight(true);
+        gameHistoryTable.setBackground(Color.decode("#65b5e6"));
+        
+        gameHistoryScrollPane = new JScrollPane(gameHistoryTable, 
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        gameHistoryScrollPane.setBounds(0, 0, 300, 300);
+        gameHistoryScrollPane.setBorder(BorderFactory.createLineBorder(Color.decode("#e8f6ff"), 10, false));
+        gameHistoryFrame.getContentPane().add(gameHistoryScrollPane, BorderLayout.CENTER);
+        
+        gameHistoryFrame.setVisible(true);
+        
+    }
+    
+    public void addGameHistoryRecord(GameHistoryRecord gameHistoryRecord){
+        GameHistoryTableModel model = (GameHistoryTableModel) gameHistoryTable.getModel();
+        model.addRow(gameHistoryRecord);
+    }
+    
     public void attachConnectionListener(ActionListener listenerForConnectButton){
         connectButton.addActionListener(listenerForConnectButton);
     }
@@ -570,8 +624,12 @@ public class ClientView {
         gameHistoryButton.addActionListener(listenForGameHistoryButton);
     }
     
-    public void attachWindowClosedListener(WindowAdapter listenForClosingWindow){
-        frame.addWindowListener(listenForClosingWindow);
+    public void attachGameHistoryWindowClosedListener(WindowAdapter listenForClosingGameHistoryWindow){
+        gameHistoryFrame.addWindowListener(listenForClosingGameHistoryWindow);
+    }
+    
+    public void attachClientWindowClosedListener(WindowAdapter listenForClosingClientWindow){
+        frame.addWindowListener(listenForClosingClientWindow);
     }
     
     private ImageIcon resizeIcon(ImageIcon icon, int resizedWidth, int resizedHeight){
