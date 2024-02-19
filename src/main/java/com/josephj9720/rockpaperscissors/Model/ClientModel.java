@@ -33,6 +33,10 @@ public class ClientModel {
         this.gameHistory.add(record);
     }
     
+    public GameHistoryRecord getLastGameHistoryRecord(){
+        return this.gameHistory.get(gameHistory.size() - 1);
+    }
+    
     public int getTotalNumberOfWins(){
         return this.gameHistory.size();
     }

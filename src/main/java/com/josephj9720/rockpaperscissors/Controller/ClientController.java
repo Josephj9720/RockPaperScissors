@@ -350,6 +350,7 @@ public class ClientController {
                             
                             clientView.setResultBox(result);
                             clientModel.addGameHistoryRecord(new GameHistoryRecord(opponentName, result));
+                            clientView.addGameHistoryRecord(clientModel.getLastGameHistoryRecord());
                             
                         } else if (receivedSentence.startsWith("-Accepted")){
                             

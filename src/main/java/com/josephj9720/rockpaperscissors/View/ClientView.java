@@ -588,8 +588,14 @@ public class ClientView {
     }
     
     public void addGameHistoryRecord(GameHistoryRecord gameHistoryRecord){
-        GameHistoryTableModel model = (GameHistoryTableModel) gameHistoryTable.getModel();
-        model.addRow(gameHistoryRecord);
+        
+        if(gameHistoryTable != null){
+            
+            GameHistoryTableModel model = (GameHistoryTableModel) gameHistoryTable.getModel();
+            model.addRow(gameHistoryRecord);
+            
+        }
+
     }
     
     public void attachConnectionListener(ActionListener listenerForConnectButton){
